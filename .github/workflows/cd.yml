@@ -1,0 +1,25 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Deploy
+        run: |
+          echo "Deploying application..."
+          # Add deployment commands here
+          # For example:
+          # scp -r . user@server:/path/to/deployment/
+          # ssh user@server 'cd /path/to/deployment/ && ./deploy.sh'
