@@ -23,6 +23,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set up Git
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+
+    - name: Create Procfile
+      run: |
+        echo "web: gunicorn api.wsgi --log-file -" > Procfile
+        git add Procfile
+        git commit -m "Add Procfile for Heroku" || echo "No changes to commit"
+
     - name: Set up Heroku environment variables
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
@@ -41,6 +52,13 @@ jobs:
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
         buildpack: "heroku/python"
         procfile: "web: gunicorn api.wsgi --log-file -"
+        justlogin: true
+
+    - name: Push to Heroku
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        git push https://heroku:$HEROKU_API_KEY@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git HEAD:main --force
 
     - name: Disable collectstatic
       env:
