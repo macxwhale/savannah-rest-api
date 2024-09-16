@@ -23,6 +23,18 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Export environment variables
+      run: |
+        echo "SECRET_KEY=${{ secrets.SECRET_KEY }}" >> $GITHUB_ENV
+        echo "PROD_DB_NAME=${{ secrets.PROD_DB_NAME }}" >> $GITHUB_ENV
+        echo "PROD_DB_USER=${{ secrets.PROD_DB_USER }}" >> $GITHUB_ENV
+        echo "PROD_DB_PASSWORD=${{ secrets.PROD_DB_PASSWORD }}" >> $GITHUB_ENV
+        echo "PROD_DB_HOST=${{ secrets.PROD_DB_HOST }}" >> $GITHUB_ENV
+        echo "PROD_DB_PORT=${{ secrets.PROD_DB_PORT }}" >> $GITHUB_ENV
+        echo "AT_API_KEY=${{ secrets.AT_API_KEY }}" >> $GITHUB_ENV
+        echo "AT_SENDER_ID=${{ secrets.AT_SENDER_ID }}" >> $GITHUB_ENV
+        echo "AT_USERNAME=${{ secrets.AT_USERNAME }}" >> $GITHUB_ENV
+
     - name: Run Django Migrations
       run: |
         python api/manage.py migrate  # <-- Adjust this path as necessary
@@ -30,7 +42,14 @@ jobs:
     - name: Deploy to Heroku
       env:
         HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_APP_NAME: your-app-name
+        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       run: |
         git remote add heroku https://git.heroku.com/${{ env.HEROKU_APP_NAME }}.git
         git push heroku main
+
+    - name: Run Migrations on Heroku
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+      run: |
+        heroku run python api/manage.py migrate --app ${{ env.HEROKU_APP_NAME }}
