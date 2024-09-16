@@ -98,16 +98,25 @@ WSGI_APPLICATION = "api.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": env("PROD_DB_NAME"),
-        "USER": env("PROD_DB_USER"),
-        "PASSWORD": env("PROD_DB_PASSWORD"),
-        "HOST": env("PROD_DB_HOST"),
-        "PORT": env("PROD_DB_PORT"),
+if "GITHUB_ACTIONS" in os.environ:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": ":memory:",
+        }
     }
-}
+
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env("PROD_DB_NAME"),
+            "USER": env("PROD_DB_USER"),
+            "PASSWORD": env("PROD_DB_PASSWORD"),
+            "HOST": env("PROD_DB_HOST"),
+            "PORT": env("PROD_DB_PORT"),
+        }
+    }
 
 
 # Password validation
