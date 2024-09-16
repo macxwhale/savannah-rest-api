@@ -23,12 +23,30 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
+    - name: Set up Heroku environment variables
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        heroku config:set \
+          SECRET_KEY="${{ secrets.SECRET_KEY }}" \
+          DEBUG="False" \
+          ALLOWED_HOSTS="${{ secrets.HEROKU_APP_NAME }}.herokuapp.com" \
+          --app ${{ secrets.HEROKU_APP_NAME }}
+
     - name: Deploy to Heroku
       uses: akhileshns/heroku-deploy@v3.12.14
       with:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        buildpack: "heroku/python"
+        procfile: "web: gunicorn api.wsgi --log-file -"
+
+    - name: Disable collectstatic
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      run: |
+        heroku config:set DISABLE_COLLECTSTATIC=1 --app ${{ secrets.HEROKU_APP_NAME }}
 
     - name: Run Migrations on Heroku
       env:
