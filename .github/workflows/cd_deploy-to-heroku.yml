@@ -35,21 +35,23 @@ jobs:
         echo "AT_SENDER_ID=${{ secrets.AT_SENDER_ID }}" >> $GITHUB_ENV
         echo "AT_USERNAME=${{ secrets.AT_USERNAME }}" >> $GITHUB_ENV
 
+    - name: Install Heroku CLI
+      run: |
+        curl https://cli-assets.heroku.com/install.sh | sh
+
+    - name: Authenticate with Heroku
+      run: |
+        echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
+
     - name: Run Django Migrations
       run: |
-        python api/manage.py migrate  # <-- Adjust this path as necessary
+        python api/manage.py migrate  # Adjust this path if necessary
 
     - name: Deploy to Heroku
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       run: |
-        git remote add heroku https://git.heroku.com/${{ env.HEROKU_APP_NAME }}.git
+        git remote add heroku https://git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git
         git push heroku main
 
     - name: Run Migrations on Heroku
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
       run: |
-        heroku run python api/manage.py migrate --app ${{ env.HEROKU_APP_NAME }}
+        heroku run python api/manage.py migrate --app ${{ secrets.HEROKU_APP_NAME }}
