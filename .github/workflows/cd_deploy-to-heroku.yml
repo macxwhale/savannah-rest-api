@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
+      with:
+        fetch-depth: 0  # Unshallow the repository
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -53,12 +55,6 @@ jobs:
         buildpack: "heroku/python"
         procfile: "web: gunicorn api.wsgi --log-file -"
         justlogin: true
-
-    - name: Push to Heroku
-      env:
-        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      run: |
-        git push https://heroku:$HEROKU_API_KEY@git.heroku.com/${{ secrets.HEROKU_APP_NAME }}.git HEAD:main --force
 
     - name: Disable collectstatic
       env:
