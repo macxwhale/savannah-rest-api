@@ -44,10 +44,6 @@ jobs:
         echo "AT_SENDER_ID=${{ secrets.AT_SENDER_ID }}" >> $GITHUB_ENV
         echo "AT_USERNAME=${{ secrets.AT_USERNAME }}" >> $GITHUB_ENV
 
-    - name: Change to project directory
-      run: |
-        cd api  # Adjust this if the project folder name is different
-
     - name: Run Tests
       run: |
         python manage.py test
